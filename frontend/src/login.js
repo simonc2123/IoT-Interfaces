@@ -16,6 +16,7 @@ const Login = ({ setUserRole }) => {
         username,
         password,
       });
+      const home = response.data.home;
       console.log("Inicio de sesión exitoso:", response.data);
       setUserRole(response.data.rol);
       navigate("/home"); // Redirige al usuario a la página de inicio correspondiente
