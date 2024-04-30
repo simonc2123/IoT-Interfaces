@@ -9,25 +9,10 @@ import HomeAdmin from "./HomeAdmin";
 import HomeUser from "./HomeUser";
 import HomeVigilante from "./HomeVigilante";
 import HomeBombero from "./HomeBombero";
-import Login from "./login.js";
+import Login from "./login";
 
 const App = () => {
   const [userRole, setUserRole] = useState("");
-
-  const renderHome = () => {
-    switch (userRole) {
-      case "administrador":
-        return <HomeAdmin />;
-      case "usuario":
-        return <HomeUser />;
-      case "vigilante":
-        return <HomeVigilante />;
-      case "bombero":
-        return <HomeBombero />;
-      default:
-        return <Navigate to="/" />;
-    }
-  };
 
   return (
     <Router>
@@ -35,11 +20,28 @@ const App = () => {
         <Route path="/" element={<Login setUserRole={setUserRole} />} />
         <Route
           path="/home"
-          element={userRole ? renderHome() : <Navigate to="/" />}
+          element={
+            userRole ? renderHome(userRole) : <Navigate to="/" replace />
+          }
         />
       </Routes>
     </Router>
   );
+};
+
+const renderHome = (userRole) => {
+  switch (userRole) {
+    case "admin":
+      return <HomeAdmin />;
+    case "usuario":
+      return <HomeUser />;
+    case "vigilante":
+      return <HomeVigilante />;
+    case "bombero":
+      return <HomeBombero />;
+    default:
+      return <Navigate to="/" replace />;
+  }
 };
 
 export default App;

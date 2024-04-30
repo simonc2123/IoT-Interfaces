@@ -1,6 +1,6 @@
-
 const db = require("../db/db");
 
+// Función para obtener un usuario por nombre de usuario
 exports.getUserByUsername = (username, callback) => {
   const query = "SELECT * FROM users WHERE username = ?";
   db.query(query, [username], (err, results) => {
@@ -17,9 +17,9 @@ exports.getUserByUsername = (username, callback) => {
 };
 
 // Función para crear un nuevo usuario
-exports.createUser = (username, password, callback) => {
-  const query = "INSERT INTO users (username, password) VALUES (?, ?)";
-  db.query(query, [username, password], (err, results) => {
+exports.createUser = (username, password, rol, callback) => {
+  const query = "INSERT INTO users (username, password, rol) VALUES (?, ?, ?)";
+  db.query(query, [username, password, rol], (err, results) => {
     if (err) {
       console.error("Error al crear un nuevo usuario:", err);
       return callback(err, null);
@@ -28,6 +28,7 @@ exports.createUser = (username, password, callback) => {
       id: results.insertId,
       username: username,
       password: password,
+      rol: rol,
     };
     return callback(null, newUser);
   });

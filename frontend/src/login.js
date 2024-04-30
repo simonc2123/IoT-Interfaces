@@ -17,10 +17,8 @@ const Login = ({ setUserRole }) => {
         password,
       });
       console.log("Inicio de sesión exitoso:", response.data);
-      // Seteamos el rol del usuario en el estado global
       setUserRole(response.data.rol);
-      // Redirige al usuario a la página de inicio correspondiente después del inicio de sesión exitoso
-      navigate("/home");
+      navigate("/home"); // Redirige al usuario a la página de inicio correspondiente
     } catch (error) {
       console.error(
         "Error al iniciar sesión:",
@@ -113,8 +111,7 @@ const SubmitButton = styled.button`
 
 const ErrorMessage = styled.p`
   margin-top: 10px;
-  color: #007bff;
-  text-decoration: none;
+  color: #ff0000; /* Cambia el color para destacar los mensajes de error */
 `;
 
 export default Login;
