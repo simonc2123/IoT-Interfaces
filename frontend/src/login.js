@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
-const Login = ({ setUserRole }) => {
+const Login = ({ setUserRole , setUserHome }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -18,6 +18,7 @@ const Login = ({ setUserRole }) => {
       });
       const home = response.data.home;
       console.log("Inicio de sesión exitoso:", response.data);
+      setUserHome(home);
       setUserRole(response.data.rol);
       navigate("/home"); // Redirige al usuario a la página de inicio correspondiente
     } catch (error) {
