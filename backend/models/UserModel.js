@@ -2,7 +2,7 @@
 const db = require("../db/db");
 
 exports.getUserByUsername = (username, callback) => {
-  const query = "SELECT * FROM usuarios_parcial WHERE username = ?";
+  const query = "SELECT * FROM users WHERE username = ?";
   db.query(query, [username], (err, results) => {
     if (err) {
       console.error("Error al buscar usuario por nombre de usuario:", err);
@@ -17,10 +17,10 @@ exports.getUserByUsername = (username, callback) => {
 };
 
 // Función para crear un nuevo usuario
-exports.createUser = (username, password, nodo, rol, callback) => {
+exports.createUser = (username, password, home, rol, callback) => {
   const query =
-    "INSERT INTO usuarios_parcial (username, password, nodo, rol) VALUES (?, ?, ?, ?)";
-  db.query(query, [username, password, nodo, rol], (err, results) => {
+    "INSERT INTO users (username, password, home, rol) VALUES (?, ?, ?, ?)";
+  db.query(query, [username, password, home, rol], (err, results) => {
     if (err) {
       console.error("Error al crear un nuevo usuario:", err);
       return callback(err, null);
@@ -29,7 +29,7 @@ exports.createUser = (username, password, nodo, rol, callback) => {
       id: results.insertId,
       username: username,
       password: password,
-      nodo: nodo,
+      home: home,
       rol: rol,
     };
     return callback(null, newUser);
@@ -38,7 +38,7 @@ exports.createUser = (username, password, nodo, rol, callback) => {
 
 // Función para obtener todos los usuarios
 exports.getAllUsers = (callback) => {
-  const query = "SELECT * FROM usuarios_parcial";
+  const query = "SELECT * FROM users";
   db.query(query, (err, results) => {
     if (err) {
       console.error("Error al obtener todos los usuarios:", err);
@@ -49,10 +49,10 @@ exports.getAllUsers = (callback) => {
 };
 
 // Función para actualizar un usuario existente
-exports.updateUser = (id, username, password, nodo, rol, callback) => {
+exports.updateUser = (id, username, password, home, rol, callback) => {
   const query =
-    "UPDATE usuarios_parcial SET username = ?, password = ?, nodo = ?, rol = ? WHERE id = ?";
-  db.query(query, [username, password, nodo, rol, id], (err, results) => {
+    "UPDATE users SET username = ?, password = ?, home = ?, rol = ? WHERE id = ?";
+  db.query(query, [username, password, home, rol, id], (err, results) => {
     if (err) {
       console.error("Error al actualizar el usuario:", err);
       return callback(err, null);
@@ -65,7 +65,7 @@ exports.updateUser = (id, username, password, nodo, rol, callback) => {
       id: id,
       username: username,
       password: password,
-      nodo: nodo,
+      home: home,
       rol: rol,
     };
     return callback(null, updatedUser);
@@ -74,7 +74,7 @@ exports.updateUser = (id, username, password, nodo, rol, callback) => {
 
 // Función para eliminar un usuario existente
 exports.deleteUser = (id, callback) => {
-  const query = "DELETE FROM usuarios_parcial WHERE id = ?";
+  const query = "DELETE FROM users WHERE id = ?";
   db.query(query, [id], (err, results) => {
     if (err) {
       console.error("Error al eliminar el usuario:", err);

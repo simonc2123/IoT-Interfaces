@@ -7,6 +7,8 @@ import {
 } from "react-router-dom";
 import HomeAdmin from "./HomeAdmin";
 import HomeUser from "./HomeUser";
+import HomeVigilante from "./HomeVigilante";
+import HomeBombero from "./HomeBombero";
 import Login from "./login";
 
 const App = () => {
@@ -19,6 +21,10 @@ const App = () => {
         return <HomeAdmin/>;
       case "usuario":
         return <HomeUser userHome={userHome} />;
+      case "vigilante":
+        return <HomeVigilante/>;
+      case "bombero":
+        return <HomeBombero/>;
       default:
         return <Navigate to="/" replace />;
     }

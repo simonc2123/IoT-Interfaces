@@ -5,37 +5,49 @@ import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 
 const HomeUser = ({ userHome }) => {
+  const [cantidadGas, setCantidadGas] = useState(0);
   const [temperatura, setTemperatura] = useState(0);
-  const [temperaturaEstado, setTemperaturaEstado] = useState("Desconocido");
-  const [lluviaValor, setLluviaValor] = useState(0);
-  const [lluviaEstado, setLluviaEstado] = useState("Desconocido");
+  const [incendio, setIncendio] = useState(false);
+  const [estadoPuerta, setEstadoPuerta] = useState("Desconocido");
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [temperaturaResponse, lluviaResponse] = await Promise.all([
-          axios.get(`http://localhost:1880/temperaturapornodo?id=${userHome}`),
-          axios.get(`http://localhost:1880/lluviapornodo?id=${userHome}`),
-        ]);
-
-        // Temperatura
-        if (temperaturaResponse.data) {
-          const temperaturaData = temperaturaResponse.data[0];
-          const temperaturaActual = temperaturaData?.valor || 0;
-          const temperaturaEstadoActual =
-            temperaturaData?.estado || "Desconocido";
-          setTemperatura(temperaturaActual);
-          setTemperaturaEstado(temperaturaEstadoActual);
+        const gasResponse = await axios.get(
+          `http://localhost:1880/gaspornodo?id=${userHome}`
+        );
+        if (gasResponse.data && gasResponse.data.length > 0) {
+          const firstElement = gasResponse.data[0];
+          if (firstElement && firstElement.cantidadgas !== undefined) {
+            setCantidadGas(firstElement.cantidadgas);
+          }
         }
 
-        // Lluvia
-        if (lluviaResponse.data) {
-          const lluviaData = lluviaResponse.data[0];
-          const lluviaValorActual = lluviaData?.valor || 0;
-          const lluviaEstadoActual = lluviaData?.estado || "Desconocido";
-          setLluviaValor(lluviaValorActual);
-          setLluviaEstado(lluviaEstadoActual);
+        const puertaResponse = await axios.get(
+          `http://localhost:1880/puertapornodo?id=${userHome}`
+        );
+        if (puertaResponse.data && puertaResponse.data.length > 0) {
+          const firstElement = puertaResponse.data[0];
+          if (firstElement && firstElement.estadopuerta !== undefined) {
+            const estado =
+              firstElement.estadopuerta === 1
+                ? "Puerta Abierta!"
+                : "Puerta Cerrada";
+            setEstadoPuerta(estado);
+          }
+        }
+
+        const fuegoResponse = await axios.get(
+          `http://localhost:1880/fuegopornodo?id=${userHome}`
+        );
+        if (fuegoResponse.data && fuegoResponse.data.length > 0) {
+          const firstElement = fuegoResponse.data[0];
+          if (firstElement && firstElement.fuego !== undefined) {
+            const temperaturaActual = firstElement.temperatura || 0;
+            setIncendio(firstElement.fuego === 1);
+            setTemperatura(temperaturaActual);
+          }
         }
       } catch (error) {
         console.error("Error al obtener los datos:", error);
@@ -44,7 +56,7 @@ const HomeUser = ({ userHome }) => {
 
     fetchData();
 
-    const intervalId = setInterval(fetchData, 5000); // Intervalo de 5 segundos
+    const intervalId = setInterval(fetchData, 2000);
     return () => clearInterval(intervalId);
   }, [userHome]);
 
@@ -52,11 +64,46 @@ const HomeUser = ({ userHome }) => {
     navigate("/"); // Redirige al usuario a la página de inicio de sesión
   };
 
+  const handleMotorStateChange = async (newState) => {
+    try {
+      const response = await axios.post("http://localhost:1880/estadoMotor", {
+        userHome,
+        estado: newState ? 1 : 0, // Convertir newState (booleano) a 1 (true) o 0 (false)
+      });
+      console.log("Estado del motor actualizado:", response.data);
+    } catch (error) {
+      console.error("Error al actualizar el estado del motor:", error);
+    }
+  };
+
   return (
     <Container>
       <LogoutButton onClick={handleLogout}>Cerrar sesión</LogoutButton>
       <Title>Bienvenido, Usuario de la casa {userHome}</Title>
       <ContentWrapper>
+        <Section>
+          <InfoLabel>Estado de la puerta:</InfoLabel>
+          <InfoValue>{estadoPuerta}</InfoValue>
+        </Section>
+        <Section>
+          <InfoLabel>Cantidad de gas:</InfoLabel>
+          <SpeedometerWrapper>
+            <ReactSpeedometer
+              maxValue={4000}
+              value={cantidadGas}
+              needleColor="#007BFF"
+              startColor="#28A745"
+              segments={4}
+              endColor="#DC3545"
+            />
+          </SpeedometerWrapper>
+          <Button onClick={() => handleMotorStateChange(true)}>
+            Encender Motor
+          </Button>
+          <Button onClick={() => handleMotorStateChange(false)}>
+            Apagar Motor
+          </Button>
+        </Section>
         <Section>
           <InfoLabel>Temperatura:</InfoLabel>
           <SpeedometerWrapper>
@@ -69,21 +116,10 @@ const HomeUser = ({ userHome }) => {
               endColor="#DC3545"
             />
           </SpeedometerWrapper>
-          <InfoValue>Estado: {temperaturaEstado}</InfoValue>
-        </Section>
-        <Section>
-          <InfoLabel>Lluvia:</InfoLabel>
-          <SpeedometerWrapper>
-            <ReactSpeedometer
-              maxValue={100} // Ajusta según el rango de valores esperados para la lluvia
-              value={lluviaValor}
-              needleColor="#007BFF"
-              startColor="#28A745"
-              segments={4}
-              endColor="#DC3545"
-            />
-          </SpeedometerWrapper>
-          <InfoValue>Estado: {lluviaEstado}</InfoValue>
+          <InfoLabel>Fuego:</InfoLabel>
+          <InfoValue style={{ color: incendio ? "#DC3545" : "#28A745" }}>
+            {incendio ? "¡Incendio detectado!" : "Sin presencia de fuego"}
+          </InfoValue>
         </Section>
       </ContentWrapper>
     </Container>
@@ -139,6 +175,16 @@ const SpeedometerWrapper = styled.div`
   width: 100%;
   display: flex;
   justify-content: center;
+`;
+
+const Button = styled.button`
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 10px;
 `;
 
 export default HomeUser;

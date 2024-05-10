@@ -20,7 +20,7 @@ exports.login = (req, res) => {
     const userData = {
       id: user.id,
       username: user.username,
-      nodo: user.nodo,
+      home: user.home,
       rol: user.rol, // Incluir el campo 'rol' en los datos del usuario
     };
     res.status(200).json(userData);

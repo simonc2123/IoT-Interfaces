@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
-const Login = ({ setUserRole, setUserHome }) => {
+const Login = ({ setUserRole , setUserHome }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -16,8 +16,7 @@ const Login = ({ setUserRole, setUserHome }) => {
         username,
         password,
       });
-      const home = response.data.nodo;
-      console.log(home);
+      const home = response.data.home;
       console.log("Inicio de sesión exitoso:", response.data);
       setUserHome(home);
       setUserRole(response.data.rol);
@@ -33,16 +32,6 @@ const Login = ({ setUserRole, setUserHome }) => {
 
   return (
     <CenteredContainer>
-      <CustomH3>
-        Estacion meteorologica, este es un proyecto individual que ha sido
-        desarrollado por Simon David Colmenares Sanchez, para la entrega de los
-        parciales 1,2,3 y 4, en este momento se consta de dos nodos, uno de
-        ellos real y el otro simulado por medio de mqttx, ademas de un usuario
-        admin, e el cual puede acceder a la informacion en general de los
-        usuarios
-      </CustomH3>
-      <Space /> {/* Espacio adicional */}
-      <hr></hr>
       <h2>Iniciar sesión</h2>
       {error && <ErrorMessage>{error}</ErrorMessage>}
       <LoginForm onSubmit={handleSubmit}>
@@ -76,19 +65,6 @@ const CenteredContainer = styled.div`
   align-items: center;
   justify-content: center;
   height: 100vh;
-`;
-
-const CustomH3 = styled.h3`
-  font-size: 18px;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 20px;
-  line-height: 1.5;
-  color: #333; /* Cambia el color del texto si es necesario */
-`;
-
-const Space = styled.div`
-  height: 20px; /* Altura del espacio adicional */
 `;
 
 const LoginForm = styled.form`
